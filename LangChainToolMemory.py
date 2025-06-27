@@ -3,7 +3,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain_ollama import OllamaLLM
 
 def get_exchange_rate(_):
-    return "อัตราแลกเปลี่ยนวันนี้คือ 36.50 บาท/ดอลลาร์"
+    return "Final Answer: อัตราแลกเปลี่ยนวันนี้คือ 36.50 บาท/ดอลลาร์"  # เพิ่ม Final Answer เพื่อให้ agent หยุด loop
 
 tools = [
     Tool(
@@ -33,7 +33,8 @@ agent = initialize_agent(
     llm=llm,
     agent="zero-shot-react-description",
     memory=memory,
-    verbose=True
+    verbose=True,
+    max_iterations=3  # จำกัดรอบการคิด ไม่ให้วน loop
 )
 
 agent_executor = AgentExecutor.from_agent_and_tools(

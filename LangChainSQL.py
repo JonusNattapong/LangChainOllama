@@ -15,6 +15,8 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS users (
     name TEXT,
     age INTEGER
 )''')
+cursor.execute("DELETE FROM users")  # ลบข้อมูลเดิมออกก่อน
+cursor.execute("DELETE FROM sqlite_sequence WHERE name='users'")  # รีเซ็ต id ให้นับใหม่
 cursor.execute("INSERT INTO users (name, age) VALUES ('Alice', 30)")
 cursor.execute("INSERT INTO users (name, age) VALUES ('Bob', 25)")
 conn.commit()
@@ -30,7 +32,8 @@ agent_executor = create_sql_agent(
     llm=llm,
     db=sql_db,
     agent_type="zero-shot-react-description",
-    verbose=True
+    verbose=True,
+    handle_parsing_errors=True  # เพิ่มบรรทัดนี้เพื่อให้ agent ไม่ล้มเมื่อเจอ output parsing error
 )
 
 # 5. ตัวอย่างการถามข้อมูล
