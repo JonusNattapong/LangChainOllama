@@ -5,10 +5,25 @@ from langchain_community.tools import DuckDuckGoSearchRun
 from langchain.agents import initialize_agent, Tool
 from langchain_ollama import OllamaLLM
 
-# 1. สร้าง Search Tool
+def search_with_final_answer(query):
+    """ฟังก์ชันค้นหาที่จัดรูปแบบผลลัพธ์เป็น Final Answer"""
+    try:
+        search_tool = DuckDuckGoSearchRun(backend="api")
+        result = search_tool.run(query)
+        return f"Final Answer: {result}"
+    except Exception as e:
+        # Fallback ไปใช้ backend="html" ถ้า api ไม่ได้
+        try:
+            search_tool_html = DuckDuckGoSearchRun(backend="html")
+            result = search_tool_html.run(query)
+            return f"Final Answer: {result}"
+        except Exception as e2:
+            return f"Final Answer: ไม่สามารถค้นหาข้อมูลได้ในขณะนี้ เนื่องจาก {str(e2)}"
+
+# 1. สร้าง Search Tool พร้อม error handling
 search_tool = Tool(
     name="search",
-    func=DuckDuckGoSearchRun().run,
+    func=search_with_final_answer,
     description="ใช้ค้นหาข้อมูลล่าสุดจากอินเทอร์เน็ตด้วย DuckDuckGo (ผลลัพธ์จะสรุปเป็น Final Answer อัตโนมัติ)"
 )
 
@@ -21,21 +36,15 @@ agent = initialize_agent(
     llm=llm,
     agent="zero-shot-react-description",
     verbose=True,
-    max_iterations=3  # จำกัดรอบการคิด ไม่ให้วน loop
+    max_iterations=3,  # จำกัดรอบการคิด ไม่ให้วน loop
+    handle_parsing_errors=True  # จัดการ parsing error
 )
 
-# 4. ตัวอย่างการถามข้อมูล
-query = "ข่าวเทคโนโลยีล่าสุดวันนี้คืออะไร?"
-response = agent.invoke(query)
-print(response)
-
-def search_with_final_answer(query):
-    result = search_tool.run(query)
-    return f"Final Answer: {result}"
-
-# ปรับ Tool ให้ใช้ฟังก์ชันใหม่
-search_tool = Tool(
-    name="search",
-    func=search_with_final_answer,
-    description="ใช้ค้นหาข้อมูลล่าสุดจากอินเทอร์เน็ตด้วย DuckDuckGo (ผลลัพธ์จะสรุปเป็น Final Answer อัตโนมัติ)"
-)
+# 4. ตัวอย่างการใช้งาน
+if __name__ == "__main__":
+    query = "ข่าวเทคโนโลยีล่าสุดวันนี้คืออะไร?"
+    try:
+        response = agent.invoke(query)
+        print("ผลลัพธ์:", response.get("output", response))
+    except Exception as e:
+        print(f"เกิดข้อผิดพลาด: {e}")

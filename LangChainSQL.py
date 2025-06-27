@@ -7,19 +7,36 @@ from langchain_ollama import OllamaLLM
 import sqlite3
 import os
 
-# 1. สร้าง/เชื่อมต่อฐานข้อมูล SQLite และสร้างตารางตัวอย่าง
-conn = sqlite3.connect('example.db')
-cursor = conn.cursor()
-cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT,
-    age INTEGER
-)''')
-cursor.execute("DELETE FROM users")  # ลบข้อมูลเดิมออกก่อน
-cursor.execute("DELETE FROM sqlite_sequence WHERE name='users'")  # รีเซ็ต id ให้นับใหม่
-cursor.execute("INSERT INTO users (name, age) VALUES ('Alice', 30)")
-cursor.execute("INSERT INTO users (name, age) VALUES ('Bob', 25)")
-conn.commit()
+def setup_database():
+    """ตั้งค่าฐานข้อมูลตัวอย่าง"""
+    conn = sqlite3.connect('example.db')
+    cursor = conn.cursor()
+    
+    # สร้างตาราง users
+    cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT NOT NULL,
+        age INTEGER NOT NULL,
+        email TEXT UNIQUE
+    )''')
+    
+    # ลบข้อมูลเดิมและรีเซ็ต id
+    cursor.execute("DELETE FROM users")
+    cursor.execute("DELETE FROM sqlite_sequence WHERE name='users'")
+    
+    # เพิ่มข้อมูลตัวอย่าง
+    sample_data = [
+        ('Alice', 30, 'alice@example.com'),
+        ('Bob', 25, 'bob@example.com'),
+        ('Charlie', 35, 'charlie@example.com')
+    ]
+    
+    cursor.executemany("INSERT INTO users (name, age, email) VALUES (?, ?, ?)", sample_data)
+    conn.commit()
+    conn.close()
+
+# 1. ตั้งค่าฐานข้อมูล
+setup_database()
 
 # 2. สร้าง SQLDatabase object
 sql_db = SQLDatabase.from_uri('sqlite:///example.db')
@@ -27,16 +44,36 @@ sql_db = SQLDatabase.from_uri('sqlite:///example.db')
 # 3. สร้าง LLM (Ollama)
 llm = OllamaLLM(model="llama3.2:3b")
 
-# 4. สร้าง Agent ที่เชื่อมต่อ SQL
+# 4. สร้าง SQL Agent ที่มีประสิทธิภาพดีขึ้น
 agent_executor = create_sql_agent(
     llm=llm,
     db=sql_db,
     agent_type="zero-shot-react-description",
     verbose=True,
-    handle_parsing_errors=True  # เพิ่มบรรทัดนี้เพื่อให้ agent ไม่ล้มเมื่อเจอ output parsing error
+    handle_parsing_errors=True,
+    max_iterations=5,  # เพิ่มจำนวนรอบสำหรับ SQL ที่ซับซ้อน
+    max_execution_time=30,  # หมดเวลา 30 วินาที
+    return_intermediate_steps=True
 )
 
-# 5. ตัวอย่างการถามข้อมูล
-query = "มีใครบ้างในฐานข้อมูล และอายุเท่าไร?"
-response = agent_executor.invoke({"input": query})
-print(response["output"])
+# 5. ฟังก์ชันสำหรับถามข้อมูล
+def query_database(question):
+    """ฟังก์ชันสำหรับถามข้อมูลจากฐานข้อมูล"""
+    try:
+        response = agent_executor.invoke({"input": question})
+        return response.get("output", "ไม่สามารถหาคำตอบได้")
+    except Exception as e:
+        return f"เกิดข้อผิดพลาด: {e}"
+
+# 6. ตัวอย่างการใช้งาน
+if __name__ == "__main__":
+    questions = [
+        "มีใครบ้างในฐานข้อมูล และอายุเท่าไร?",
+        "ใครอายุมากที่สุด?",
+        "มีกี่คนที่อายุมากกว่า 30 ปี?"
+    ]
+    
+    for i, question in enumerate(questions, 1):
+        print(f"\n=== คำถามที่ {i}: {question} ===")
+        answer = query_database(question)
+        print(f"คำตอบ: {answer}")

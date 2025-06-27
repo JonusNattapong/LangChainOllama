@@ -3,48 +3,43 @@ from langchain.memory import ConversationBufferMemory
 from langchain_ollama import OllamaLLM
 
 def get_exchange_rate(_):
-    return "Final Answer: อัตราแลกเปลี่ยนวันนี้คือ 36.50 บาท/ดอลลาร์"  # เพิ่ม Final Answer เพื่อให้ agent หยุด loop
+    """ฟังก์ชันจำลองการดูอัตราแลกเปลี่ยน"""
+    return "อัตราแลกเปลี่ยนวันนี้คือ 36.50 บาท/ดอลลาร์"
 
-tools = [
-    Tool(
-        name="exchange_rate",  # ✅ ใช้ชื่อให้สั้นและตรง
-        func=get_exchange_rate,
-        description="ใช้ดูอัตราแลกเปลี่ยนเงินบาทกับดอลลาร์ สามารถเรียกใช้ด้วยคำว่า 'exchange_rate' หรือ 'ตรวจสอบอัตราแลกเปลี่ยน' หรือ 'อัตราแลกเปลี่ยน' หรือ 'ดูอัตราแลกเปลี่ยน'"
-    ),
-    Tool(
-        name="ตรวจสอบอัตราแลกเปลี่ยน",
-        func=get_exchange_rate,
-        description="ใช้ดูอัตราแลกเปลี่ยนเงินบาทกับดอลลาร์ (ชื่อภาษาไทย)"
-    ),
-    Tool(
-        name="อัตราแลกเปลี่ยน",
-        func=get_exchange_rate,
-        description="ใช้ดูอัตราแลกเปลี่ยนเงินบาทกับดอลลาร์ (ชื่อภาษาไทย)"
-    )
-]
+# สร้าง Tool เดียวที่จัดการได้หลายชื่อ
+exchange_tool = Tool(
+    name="exchange_rate",
+    func=get_exchange_rate,
+    description="ใช้ดูอัตราแลกเปลี่ยนเงินบาทกับดอลลาร์ สามารถเรียกใช้ได้หลายชื่อ เช่น exchange_rate, อัตราแลกเปลี่ยน, ตรวจสอบอัตราแลกเปลี่ยน"
+)
 
+tools = [exchange_tool]
+
+# สร้าง LLM และ Memory
 llm = OllamaLLM(model="llama3.2:3b")
+memory = ConversationBufferMemory(memory_key="chat_history", return_messages=True)
 
-memory = ConversationBufferMemory(memory_key="chat_history")
-
-# สร้าง AgentExecutor แบบควบคุมได้
-agent = initialize_agent(
+# สร้าง Agent ที่มีประสิทธิภาพดีขึ้น
+agent_executor = initialize_agent(
     tools=tools,
     llm=llm,
     agent="zero-shot-react-description",
     memory=memory,
     verbose=True,
-    max_iterations=3  # จำกัดรอบการคิด ไม่ให้วน loop
+    max_iterations=3,  # จำกัดรอบการคิด
+    handle_parsing_errors=True,  # จัดการ parsing error
+    early_stopping_method="generate"  # หยุดเร็วขึ้นเมื่อได้คำตอบ
 )
 
-agent_executor = AgentExecutor.from_agent_and_tools(
-    agent=agent.agent,
-    tools=tools,
-    memory=memory,
-    verbose=True,
-    max_iterations=3,
-    handle_parsing_errors=True
-)
-
-response = agent_executor.invoke("ตอนนี้อัตราแลกเปลี่ยนเป็นเท่าไร?")
-print(response)
+# ตัวอย่างการใช้งาน
+if __name__ == "__main__":
+    try:
+        response = agent_executor.invoke("ตอนนี้อัตราแลกเปลี่ยนเป็นเท่าไร?")
+        print("ผลลัพธ์:", response.get("output", response))
+        
+        # ทดสอบ Memory
+        response2 = agent_executor.invoke("ขอบคุณสำหรับข้อมูล")
+        print("ผลลัพธ์ที่ 2:", response2.get("output", response2))
+        
+    except Exception as e:
+        print(f"เกิดข้อผิดพลาด: {e}")
