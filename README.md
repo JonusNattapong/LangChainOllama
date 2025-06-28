@@ -267,16 +267,16 @@ with get_openai_callback() as cb:
 
 ```mermaid
 graph TD
-    A[รับข้อความหรือหัวข้อจากผู้ใช้] --> B[ตรวจสอบ input และ validate]
-    B --> C[เตรียม PromptTemplate]
-    C --> D[โหลด Ollama LLM]
-    D --> E[สร้าง RunnableSequence/Chain]
-    E --> F[ส่งข้อความเข้า LLM]
-    F --> G[รับผลลัพธ์จาก LLM]
-    G --> H[แสดงผลลัพธ์หรือ return]
-    B -. batch mode .-> I[วนลูปหัวข้อหลายรายการ]
+    A[รับข้อความ] --> B[validate input]
+    B --> C[เตรียม prompt]
+    C --> D[โหลด LLM]
+    D --> E[สร้าง chain]
+    E --> F[ส่งเข้า LLM]
+    F --> G[รับผลลัพธ์]
+    G --> H[แสดงผล]
+    B -. batch .-> I[วนลูปหลายหัวข้อ]
     I --> C
-    H -. error .-> J[handle error/logging]
+    H -. error .-> J[handle error]
 ```
 
 **อธิบาย:**
@@ -292,17 +292,17 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับ path ไฟล์หรือคำถามจากผู้ใช้] --> B[ตรวจสอบไฟล์หรือโหลดเอกสาร]
-    B --> C[แปลงเอกสารเป็น chunks]
-    C --> D[สร้างเวกเตอร์สโตร์: FAISS + Embedding]
-    D --> E[ตั้งค่า QA Chain: PromptTemplate + Retriever]
-    E --> F[รับคำถามจากผู้ใช้]
-    F --> G[แปลงคำถามเป็นเวกเตอร์]
-    G --> H[ค้นหา context ที่เกี่ยวข้อง]
-    H --> I[รวม context + คำถาม]
-    I --> J[ส่งเข้า LLM]
-    J --> K[แสดงคำตอบ + แหล่งอ้างอิง]
-    B -. error .-> L[handle error/logging]
+    A[รับไฟล์/คำถาม] --> B[โหลดเอกสาร]
+    B --> C[แบ่ง chunk]
+    C --> D[สร้างเวกเตอร์]
+    D --> E[ตั้งค่า QA]
+    E --> F[รับคำถาม]
+    F --> G[แปลงเป็นเวกเตอร์]
+    G --> H[ค้น context]
+    H --> I[รวม context]
+    I --> J[เข้า LLM]
+    J --> K[แสดงคำตอบ]
+    B -. error .-> L[handle error]
 ```
 
 **อธิบาย:**
@@ -315,15 +315,15 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับไฟล์หลายไฟล์: TXT, PDF] --> B[โหลดและแบ่งเอกสารทั้งหมด]
-    B --> C[สร้างเวกเตอร์สโตร์: FAISS]
-    C --> D[ตั้งค่า QA Chain]
-    D --> E[รับคำถามจากผู้ใช้]
-    E --> F[ค้นหา context จากหลายแหล่ง]
-    F --> G[รวม context + คำถาม]
-    G --> H[ส่งเข้า LLM]
-    H --> I[แสดงคำตอบ + แหล่งอ้างอิง]
-    B -. error .-> J[handle error/logging]
+    A[รับหลายไฟล์] --> B[โหลด+แบ่งเอกสาร]
+    B --> C[สร้างเวกเตอร์]
+    C --> D[ตั้งค่า QA]
+    D --> E[รับคำถาม]
+    E --> F[ค้น context]
+    F --> G[รวม context]
+    G --> H[เข้า LLM]
+    H --> I[แสดงคำตอบ]
+    B -. error .-> J[handle error]
 ```
 
 **อธิบาย:**
@@ -335,15 +335,15 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับคำถาม SQL จากผู้ใช้] --> B[วิเคราะห์ intent]
-    B --> C[สร้าง SQL Query]
-    C --> D[รัน SQL กับฐานข้อมูล SQLite]
-    D --> E[แปลงผลลัพธ์เป็นข้อความ]
-    E --> F[แสดงผลลัพธ์]
-    F --> G[บันทึก query history]
-    F -. analytics .-> H[สร้าง dashboard หรือ analytics]
-    F -. suggest .-> I[แนะนำคำถาม]
-    A -. error .-> J[handle error/logging]
+    A[รับ SQL] --> B[วิเคราะห์ intent]
+    B --> C[สร้าง query]
+    C --> D[รัน SQL]
+    D --> E[แปลงผลลัพธ์]
+    E --> F[แสดงผล]
+    F --> G[บันทึก history]
+    F -. analytics .-> H[dashboard]
+    F -. suggest .-> I[แนะนำ]
+    A -. error .-> J[handle error]
 ```
 
 **อธิบาย:**
@@ -356,13 +356,13 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับคำถามจากผู้ใช้] --> B[เลือก search tool: DuckDuckGo หรือ Bing]
-    B --> C[ค้นหาข้อมูลสดจากเว็บ: API หรือ HTML]
-    C --> D[สกัดหรือสรุปผลลัพธ์]
-    D --> E[ส่งเข้า LLM ถ้ามี]
-    E --> F[แสดงผลลัพธ์]
-    C -. fallback .-> G[ลองกลยุทธ์ fallback อื่น]
-    A -. error .-> H[handle error/logging]
+    A[รับคำถาม] --> B[เลือก search tool]
+    B --> C[ค้นเว็บ]
+    C --> D[สรุปผล]
+    D --> E[เข้า LLM]
+    E --> F[แสดงผล]
+    C -. fallback .-> G[fallback]
+    A -. error .-> H[handle error]
 ```
 
 **อธิบาย:**
@@ -375,13 +375,13 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับข้อความต้นฉบับ] --> B[ตรวจจับภาษาอัตโนมัติ]
-    B --> C[เลือกโมเดล LLM ที่เหมาะสม]
-    C --> D[แปลข้อความ]
-    D --> E[แสดงผลลัพธ์]
-    A -. batch .-> F[วนลูปแปลหลายข้อความ]
+    A[รับข้อความ] --> B[ตรวจจับภาษา]
+    B --> C[เลือก LLM]
+    C --> D[แปล]
+    D --> E[แสดงผล]
+    A -. batch .-> F[แปลหลายข้อความ]
     D -. context .-> G[แปลตามบริบท]
-    A -. error .-> H[handle error/logging]
+    A -. error .-> H[handle error]
 ```
 
 **อธิบาย:**
@@ -394,16 +394,16 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับไฟล์ PDF และคำถาม] --> B[แปลง PDF เป็นข้อความ]
+    A[รับ PDF+คำถาม] --> B[แปลง PDF]
     B --> C[แบ่ง chunk]
-    C --> D[สร้างเวกเตอร์สโตร์]
-    D --> E[ตั้งค่า QA Chain]
+    C --> D[สร้างเวกเตอร์]
+    D --> E[ตั้งค่า QA]
     E --> F[รับคำถาม]
-    F --> G[ค้นหา context ใน PDF]
-    G --> H[รวม context + คำถาม]
-    H --> I[ส่งเข้า LLM]
+    F --> G[ค้น context]
+    G --> H[รวม context]
+    H --> I[เข้า LLM]
     I --> J[แสดงคำตอบ]
-    A -. error .-> K[handle error/logging]
+    A -. error .-> K[handle error]
 ```
 
 **อธิบาย:**
@@ -415,12 +415,12 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับข้อความ] --> B[สกัด triplet: subject-predicate-object]
-    B --> C[สร้างหรืออัปเดตกราฟความรู้ networkx]
-    C --> D[รับคำถามเกี่ยวกับกราฟ]
-    D --> E[ตั้งค่า prompt หรือ query LLM]
-    E --> F[แสดงผลลัพธ์หรือ Node ที่เกี่ยวข้อง]
-    A -. error .-> G[handle error/logging]
+    A[รับข้อความ] --> B[สกัด triplet]
+    B --> C[อัปเดตกราฟ]
+    C --> D[รับคำถาม]
+    D --> E[ตั้งค่า prompt]
+    E --> F[แสดง node]
+    A -. error .-> G[handle error]
 ```
 
 **อธิบาย:**
@@ -432,10 +432,10 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับข้อความ] --> B[ส่งเข้า LLM วิเคราะห์อารมณ์]
-    B --> C[แสดงผลลัพธ์: บวก-ลบ-กลาง พร้อมเหตุผล]
+    A[รับข้อความ] --> B[เข้า LLM วิเคราะห์]
+    B --> C[แสดงอารมณ์]
     A -. batch .-> D[วิเคราะห์หลายข้อความ]
-    A -. error .-> E[handle error/logging]
+    A -. error .-> E[handle error]
 ```
 
 **อธิบาย:**
@@ -447,11 +447,11 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับข้อความ] --> B[ส่งเข้า LLM จัดประเภท]
-    B --> C[แสดงผลลัพธ์: หมวดหมู่-ความมั่นใจ-เหตุผล]
+    A[รับข้อความ] --> B[เข้า LLM จัดประเภท]
+    B --> C[แสดงหมวดหมู่]
     A -. batch .-> D[จัดประเภทหลายข้อความ]
-    C -. distribution .-> E[สรุปการกระจายหมวดหมู่]
-    A -. error .-> F[handle error/logging]
+    C -. distribution .-> E[สรุป distribution]
+    A -. error .-> F[handle error]
 ```
 
 **อธิบาย:**
@@ -463,11 +463,11 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับข้อความ] --> B[ส่งเข้า LLM สกัดข้อมูลสำคัญ]
-    B --> C[แสดงข้อมูลที่สกัดได้: JSON]
-    A -. batch .-> D[สกัดข้อมูลหลายข้อความ]
-    C -. export .-> E[ส่งออกผลลัพธ์เป็นไฟล์]
-    A -. error .-> F[handle error/logging]
+    A[รับข้อความ] --> B[เข้า LLM สกัดข้อมูล]
+    B --> C[แสดง JSON]
+    A -. batch .-> D[สกัดหลายข้อความ]
+    C -. export .-> E[ส่งออกไฟล์]
+    A -. error .-> F[handle error]
 ```
 
 **อธิบาย:**
@@ -479,14 +479,14 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับคำสั่งหรือคำอธิบายจากผู้ใช้] --> B[ส่งเข้า LLM สร้างโค้ด]
-    B --> C[แยกโค้ด-อธิบาย-ความซับซ้อน]
-    C --> D[validate syntax - optional]
-    D --> E[รันโค้ด ถ้ามี]
-    E --> F[แสดงผลลัพธ์]
-    F -. save .-> G[บันทึกโค้ดลงไฟล์]
-    F -. test .-> H[รัน test cases]
-    A -. error .-> I[handle error/logging]
+    A[รับคำสั่ง] --> B[เข้า LLM สร้างโค้ด]
+    B --> C[แยกโค้ด-อธิบาย]
+    C --> D[validate syntax]
+    D --> E[รันโค้ด]
+    E --> F[แสดงผล]
+    F -. save .-> G[บันทึกไฟล์]
+    F -. test .-> H[รัน test]
+    A -. error .-> I[handle error]
 ```
 
 **อธิบาย:**
@@ -498,12 +498,12 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับไอเดียหรือคำสั่งจากผู้ใช้] --> B[เลือกประเภทเนื้อหา: story-poem-dialog-description]
-    B --> C[เตรียม PromptTemplate เฉพาะ]
-    C --> D[ส่งเข้า LLM สร้างเนื้อหา]
-    D --> E[แสดงผลงานสร้างสรรค์]
+    A[รับไอเดีย] --> B[เลือกเนื้อหา]
+    B --> C[เตรียม prompt]
+    C --> D[เข้า LLM สร้างเนื้อหา]
+    D --> E[แสดงผลงาน]
     A -. batch .-> F[สร้างหลายผลงาน]
-    A -. error .-> G[handle error/logging]
+    A -. error .-> G[handle error]
 ```
 
 **อธิบาย:**
@@ -515,14 +515,14 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับข้อความหรือไฟล์ยาว] --> B[เลือกประเภทสรุป: brief-detailed-bullets-keywords-abstract]
-    B --> C[แบ่ง chunk ถ้ายาว]
-    C --> D[ส่งเข้า LLM สรุปทีละ chunk]
-    D --> E[รวมผลลัพธ์แต่ละ chunk]
+    A[รับข้อความ/ไฟล์] --> B[เลือกสรุป]
+    B --> C[แบ่ง chunk]
+    C --> D[เข้า LLM สรุป]
+    D --> E[รวมผลลัพธ์]
     E --> F[แสดงสรุป]
-    F -. save .-> G[บันทึกสรุปลงไฟล์]
+    F -. save .-> G[บันทึกไฟล์]
     A -. batch .-> H[สรุปหลายข้อความ]
-    A -. error .-> I[handle error/logging]
+    A -. error .-> I[handle error]
 ```
 
 **อธิบาย:**
@@ -534,13 +534,13 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับข้อความหรือคำถามจากผู้ใช้] --> B[เลือก Tool ที่เหมาะสม: API-คำนวณ-เวลา-อัตราแลกเปลี่ยน]
-    B --> C[เรียกใช้งาน Tool จริง]
-    C --> D[บันทึก context หรือ conversation memory]
-    D --> E[ส่งเข้า LLM ถ้ามี]
-    E --> F[แสดงผลลัพธ์]
+    A[รับข้อความ] --> B[เลือก Tool]
+    B --> C[เรียก Tool]
+    C --> D[บันทึก memory]
+    D --> E[เข้า LLM]
+    E --> F[แสดงผล]
     A -. clear .-> G[ล้าง memory]
-    A -. error .-> H[handle error/logging]
+    A -. error .-> H[handle error]
 ```
 
 **อธิบาย:**
@@ -552,12 +552,12 @@ graph TD
 
 ```mermaid
 graph TD
-    A[รับ claim/ข้ออ้างจากผู้ใช้] --> B[สร้าง search queries หลายแบบ]
-    B --> C[ค้นหาข้อมูล/หลักฐานจากเว็บ]
-    C --> D[รวบรวม evidence/sources]
-    D --> E[ส่งเข้า LLM วิเคราะห์/วิจารณ์]
-    E --> F[แสดง verdict: จริง, เท็จ, ไม่แน่ใจ พร้อมเหตุผล]
-    A -. error .-> G[handle error/logging]
+    A[รับ claim] --> B[สร้าง search]
+    B --> C[ค้นเว็บ]
+    C --> D[รวบรวม evidence]
+    D --> E[เข้า LLM วิเคราะห์]
+    E --> F[แสดง verdict]
+    A -. error .-> G[handle error]
 ```
 
 **อธิบาย:**
