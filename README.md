@@ -1,37 +1,27 @@
 # LangChainOllama
 
+[![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/) [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+
 <div align="center">
   <img src="asset/images/logo.png" alt="LangChainOllama Logo" width="200" />
 </div>
 
 ชุดตัวอย่าง LangChain + Ollama สำหรับงาน AI Agent ภาษาไทย/อังกฤษ
 
+## Table of Contents
+- [Features](#features)
+- [ติดตั้ง](#วิธีติดตั้ง)
+- [การใช้งานเบื้องต้น](#วิธีใช้งานเบื้องต้น)
+- [ภาพรวมของระบบ](#ภาพรวมของระบบ)
+- [Workflow ใหม่](#workflow-ใหม่)
+- [Best Practices](#best-practices)
+
 ## Features
 - รองรับ LLM จาก Ollama (เช่น llama3.2:3b, qwen3:1.7b)
-- ตัวอย่าง Agent หลากหลายรูปแบบ:
-  - Basic Prompt/LLM Pipeline (`LangChainBasic.py`)
-  - RAG (Retrieval Augmented Generation) + Embedding (`LangChainRAG.py`)
-  - SQL Agent (ถาม-ตอบกับฐานข้อมูล SQLite) (`LangChainSQL.py`)
-  - Tool Agent + Memory (เช่น อัตราแลกเปลี่ยน) (`LangChainToolMemory.py`)
-  - Web Tool Agent (ค้นหาข้อมูลสดจากอินเทอร์เน็ต) (`LangChainWebTool.py`)
-  - Fact-checking/Claim Verification Agent (RAG + Critic) (`LangChainFactCheckAgent.py`)
-  - Creative Agent (แต่งนิยาย/กลอน/บทพูด) (`LangChainCreativeAgent.py`)
-  - Summarization Agent (สรุปเนื้อหายาว ๆ) (`LangChainSummarizationAgent.py`)
-  - PDF Q&A Agent (ถามตอบข้อมูลจากไฟล์ PDF) (`LangChainPDFQAAgent.py`)
-  - Multi-Document RAG Agent (ถามตอบจากหลายไฟล์/หลายแหล่งข้อมูล) (`LangChainMultiDocRAGAgent.py`)
-
-## โครงสร้างไฟล์หลัก
-- `LangChainBasic.py` : ตัวอย่าง LLM + Prompt แบบง่าย
-- `LangChainRAG.py` : ตัวอย่าง RAG + FAISS + HuggingFace Embedding
-- `LangChainSQL.py` : Agent เชื่อมต่อฐานข้อมูล SQL (SQLite)
-- `LangChainToolMemory.py` : Agent ที่ใช้ Tool หลายภาษา + Memory
-- `LangChainWebTool.py` : Agent ที่ใช้ DuckDuckGo Search Tool
-- `LangChainFactCheckAgent.py` : Agent ตรวจสอบข้อเท็จจริง (Fact-check)
-- `LangChainCreativeAgent.py` : Agent สร้างสรรค์ (นิยาย/กลอน/บทพูด)
-- `LangChainSummarizationAgent.py` : Agent สำหรับสรุปเนื้อหายาว ๆ (Summarization)
-- `LangChainPDFQAAgent.py` : Agent ถามตอบข้อมูลจากไฟล์ PDF (PDF Q&A)
-- `LangChainMultiDocRAGAgent.py` : Agent ถามตอบจากหลายไฟล์/หลายแหล่งข้อมูล (Multi-Document RAG)
-- `docs/mydoc.txt` : ตัวอย่างเอกสารสำหรับ RAG
+- ตัวอย่าง Agent หลากหลายรูปแบบ (Basic, RAG, SQL, Tool+Memory, Web, Fact-check, Creative, Summarization, PDF Q&A, Multi-Document RAG)
+- ใช้ FAISS + HuggingFace Embeddings สำหรับ RAG
+- Agent พร้อม memory, error handling, logging และ input validation
+- รองรับภาษาไทยและอังกฤษ
 
 ## วิธีติดตั้ง
 1. ติดตั้ง Python >= 3.10
@@ -45,7 +35,7 @@
    HF_TOKEN=your_huggingface_token
    ```
 
-## เทคนิค/รายละเอียดสำคัญ
+## วิธีใช้งานเบื้องต้น
 - ใช้ LLM จาก Ollama ผ่าน `langchain_ollama.OllamaLLM` (รองรับ local LLM)
 - ตัวอย่าง RAG ใช้ FAISS + HuggingFaceEmbeddings (รองรับ multilingual)
 - SQL Agent ใช้ `langchain_community.agent_toolkits.create_sql_agent` เชื่อมต่อ SQLite
@@ -54,11 +44,9 @@
 - Creative Agent ใช้ Prompt Chaining (สร้างเรื่อง + แปลง style)
 - ตัวอย่างทั้งหมดรองรับภาษาไทยและอังกฤษ
 
-## หมายเหตุ
-- หาก DuckDuckGo Search โดน rate limit ให้รอหรือเปลี่ยน API
-- สามารถปรับแต่ง prompt, chain, หรือ agent ได้ตามต้องการ
-
 ## ภาพรวมของระบบ
+<details>
+<summary>คลิกเพื่อดูภาพรวม</summary>
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────┐
@@ -98,6 +86,8 @@
 │  └─────────────────────────────────────────────────────────────────────┘
 └─────────────────────────────────────────────────────────────────────────┘
 ```
+
+</details>
 
 ระบบนี้แสดงให้เห็นถึงความสามารถหลากหลายของ LangChain เมื่อผสานกับ Ollama:
 
@@ -177,7 +167,7 @@ response = rag_chain.invoke({"query": query})
 ```
 
 <div align="center">
-  <img src="asset/images/image4.png" alt="RAG System Output" width="800" />
+  <img src="asset/images/image5.png" alt="RAG System Output" width="800" />
   <p><i>ตัวอย่างการทำงานของ RAG System - ตอบคำถามจากเอกสารด้วย Vector Database</i></p>
 </div>
 
@@ -244,57 +234,15 @@ with get_openai_callback() as cb:
 ```
 
 ## 🆕 **Workflow ใหม่ที่เพิ่มเข้าม**
-- **Knowledge Graph Agent**: สร้างและถามตอบจากกราฟความรู้
-- **Sentiment Analysis Agent**: วิเคราะห์อารมณ์/ความรู้สึกของข้อความ
-- **Text Classification Agent**: จัดประเภทข้อความอัตโนมัติ
-- **Document Translation Agent**: แปลเอกสาร/ข้อความหลายภาษา
-- **Code Generation Agent**: สร้างโค้ดตัวอย่างจากคำอธิบาย
-- **Data Extraction Agent**: ดึงข้อมูลสำคัญจากข้อความ/เอกสาร
-- **Summarization Agent**: สรุปเนื้อหายาว ๆ ให้กระชับ เข้าใจง่าย
-- **PDF Q&A Agent**: ถามตอบข้อมูลจากไฟล์ PDF โดยตรง
-- **Multi-Document RAG Agent**: ถามตอบจากหลายไฟล์/หลายแหล่งข้อมูล (TXT, PDF)
-- **Advanced Summarization Agent**: สรุปเนื้อหาและให้คำแนะนำ
-- **Multilingual Q&A Agent**: ถามตอบในหลายภาษา
-- **Source Tracking Summarization Agent**: สรุปเนื้อหาพร้อมระบุแหล่งข้อมูล
-- **Code Generation Agent**: สร้างโค้ดตัวอย่างจากคำอธิบาย (ใหม่)
-- **Data Extraction Agent**: ดึงข้อมูลสำคัญจากข้อความ/เอกสาร (ใหม่)
-- **Knowledge Graph Agent**: สร้างและถามตอบจากกราฟความรู้ (ใหม่)
-
-## 🆕 **ตัวอย่าง Workflow ใหม่**
-
-#### Knowledge Graph Agent (สร้างและถามตอบจากกราฟความรู้)
-```python
-from LangChainKnowledgeGraphAgent import KnowledgeGraphAgent
-agent = KnowledgeGraphAgent()
-agent.build_graph_from_text("Steve Jobs founded Apple in 1976.")
-print(agent.query("Who founded Apple?"))
-```
-
-#### Data Extraction Agent (ดึงข้อมูลสำคัญจากข้อความ)
-```python
-from LangChainDataExtractionAgent import DataExtractionAgent
-agent = DataExtractionAgent()
-print(agent.extract("บริษัท ABC จำกัด ก่อตั้งเมื่อปี 2540 โดยนายสมชาย ตั้งอยู่ที่กรุงเทพฯ"))
-```
-
-#### Code Generation Agent (สร้างโค้ดตัวอย่างจากคำอธิบาย)
-```python
-from LangChainCodeGenAgent import CodeGenAgent
-agent = CodeGenAgent()
-print(agent.generate_code("เขียนฟังก์ชัน Python หาค่าเฉลี่ยของ list"))
-```
-
-## จุดเด่น Product-Ready
-
-- Robust error handling และ logging ในทุก agent
-- Input validation ทุกจุดก่อนประมวลผล
-- ใช้ environment variable สำหรับ key/token ที่สำคัญ
-- ปิด resource ทุกครั้งหลังใช้งาน
-- ออกแบบให้ขยาย agent ใหม่ได้ง่าย
-- ตัวอย่าง unit/integration test (แนะนำให้เพิ่ม)
-- ไม่ hardcode key/token ในโค้ด
-- รองรับการ deploy Docker, scaling, production monitoring
-- **ค้นหาไอเดียใหม่ๆ**: สามารถสร้าง agent ใหม่หรือ workflow ใหม่ได้ง่าย เช่น agent สำหรับ brainstorming, idea generation, หรือ creative writing โดยใช้ LLM + prompt chaining
+- Knowledge Graph Agent
+- Sentiment Analysis Agent
+- Text Classification Agent
+- Document Translation Agent
+- Code Generation Agent
+- Data Extraction Agent
+- Advanced Summarization Agent
+- Multilingual Q&A Agent
+- Source Tracking Summarization Agent
 
 ## Best Practices
 
@@ -306,18 +254,6 @@ print(agent.generate_code("เขียนฟังก์ชัน Python หา
 - **ขยายไอเดียใหม่**: เพิ่ม agent สำหรับค้นหาไอเดีย, สร้างเนื้อหาใหม่, หรือวิเคราะห์แนวโน้มเทคโนโลยีได้ง่ายด้วยการเพิ่มไฟล์ agent ใหม่และเชื่อมต่อกับ LLM
 
 ## อัปเดตล่าสุด
-
 - ปรับปรุง error handling, logging, input validation
-- อัปเดต README สำหรับ production-ready และ deployment
-- เพิ่มตัวอย่าง workflow ที่เหมาะกับ production
-- เพิ่ม agent ใหม่: Knowledge Graph, Sentiment, Text Classification, Data Extraction, Code Generation, Translation
-- **เพิ่มแนวทางการค้นหาไอเดียใหม่**: ตัวอย่าง agent สำหรับ idea generation, brainstorming, และ creative writing
-
-## ตัวอย่างการค้นหาไอเดียใหม่
-
-```python
-from LangChainCreativeAgent import CreativeAgent
-creative_agent = CreativeAgent()
-print(creative_agent.create_custom_content("เทคโนโลยี AI ในปี 2030", content_type="story"))
-print(creative_agent.create_custom_content("แนวโน้มธุรกิจดิจิทัล", content_type="description"))
-```
+- เพิ่มตัวอย่าง workflow สำหรับ Production-ready
+- ลบรายการซ้ำและจัดระเบียบเนื้อหา
