@@ -678,4 +678,5 @@ A: โค้ดนี้ใช้ MIT License (ฟรีสำหรับใช
 ### Q: ถ้าเจอปัญหา/bug ต้องทำอย่างไร?
 A: สามารถเปิด issue ใน GitHub หรือดู CONTRIBUTING.md เพื่อแนวทางการรายงานปัญหา
 
----
+### Q: ต้องใช้ API Key ของ LangChain (langchain cloud) หรือไม่?
+A: ไม่จำเป็นต้องใช้ API Key ของ LangChain Cloud สำหรับการใช้งานตัวอย่างในโปรเจ็คนี้ (ทุก agent ทำงาน local ได้ 100%) ยกเว้นกรณีที่ต้องการใช้ฟีเจอร์ tracing หรือ analytics ของ LangChain Cloud เท่านั้น (ซึ่งเป็น optional)
