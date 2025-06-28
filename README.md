@@ -3,8 +3,9 @@
 [![Python](https://img.shields.io/badge/python-3.10%2B-blue)](https://www.python.org/downloads/) [![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
 
 <div align="center">
-  <img src="asset/images/logo.png" alt="LangChainOllama Logo" width="200" />
+  <img src="asset/images/logo1.png" alt="LangChainOllama Logo" width="500" />
 </div>
+
 
 ชุดตัวอย่าง LangChain + Ollama สำหรับงาน AI Agent ภาษาไทย/อังกฤษ
 
@@ -116,6 +117,10 @@
 ---
 
 > ตัวอย่างนี้เหมาะสำหรับนักพัฒนา AI, นักวิจัย, นักเขียน, นักวิเคราะห์ข่าว และผู้สนใจ LangChain/Ollama
+
+<div align="center">
+  <img src="asset/images/logo.png" alt="LangChainOllama Logo" width="200" />
+</div>
 
 ## ตัวอย่างผลลัพธ์
 

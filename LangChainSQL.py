@@ -9,6 +9,9 @@ import os
 
 def setup_database():
     try:
+        # ลบไฟล์ฐานข้อมูลเดิม (ถ้ามี) เพื่อป้องกัน schema เก่า
+        if os.path.exists('example.db'):
+            os.remove('example.db')
         conn = sqlite3.connect('example.db')
         cursor = conn.cursor()
         cursor.execute('''CREATE TABLE IF NOT EXISTS users (
@@ -17,8 +20,6 @@ def setup_database():
             age INTEGER NOT NULL,
             email TEXT UNIQUE
         )''')
-        cursor.execute("DELETE FROM users")
-        cursor.execute("DELETE FROM sqlite_sequence WHERE name='users'")
         sample_data = [
             ('Alice', 30, 'alice@example.com'),
             ('Bob', 25, 'bob@example.com'),
@@ -35,11 +36,19 @@ def setup_database():
 # 1. ตั้งค่าฐานข้อมูล
 setup_database()
 
-# 2. สร้าง SQLDatabase object
-sql_db = SQLDatabase.from_uri('sqlite:///example.db')
+# 2. สร้าง SQLDatabase object (เพิ่ม top_k และ include_tables)
+sql_db = SQLDatabase.from_uri('sqlite:///example.db', include_tables=['users'], sample_rows_in_table_info=3)
 
-# 3. สร้าง LLM (Ollama)
-llm = OllamaLLM(model="llama3.2:3b")
+# 3. สร้าง LLM (Ollama) พร้อม system prompt อธิบาย schema และข้อกำหนด output
+llm = OllamaLLM(
+    model="llama3.2:3b",
+    system=(
+        "คุณคือผู้ช่วย AI ที่ตอบคำถามเกี่ยวกับฐานข้อมูล SQLite ตาราง users (id, name, age, email) "
+        "เวลาตอบ ให้ปฏิบัติตามรูปแบบของ LangChain Agent: ถ้าจะสรุป ให้ตอบ Final Answer เท่านั้น ไม่ต้องมี Action หรือ Thought ในรอบเดียวกัน "
+        "ห้ามตอบ Final Answer พร้อมกับ Action หรือ Thought ในรอบเดียวกันเด็ดขาด ให้เลือกตอบอย่างใดอย่างหนึ่งเท่านั้นในแต่ละรอบ "
+        "ตอบสั้น กระชับ และตรงประเด็น"
+    )
+)
 
 # 4. สร้าง SQL Agent ที่มีประสิทธิภาพดีขึ้น
 agent_executor = create_sql_agent(
@@ -48,8 +57,8 @@ agent_executor = create_sql_agent(
     agent_type="zero-shot-react-description",
     verbose=True,
     handle_parsing_errors=True,
-    max_iterations=5,  # เพิ่มจำนวนรอบสำหรับ SQL ที่ซับซ้อน
-    max_execution_time=30,  # หมดเวลา 30 วินาที
+    max_iterations=10,  # เพิ่มจำนวนรอบสำหรับ SQL ที่ซับซ้อน
+    max_execution_time=60,  # หมดเวลา 60 วินาที
     return_intermediate_steps=True
 )
 
