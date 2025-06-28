@@ -128,21 +128,8 @@ response = agent_executor.invoke({"input": query})
 ```
 
 <div align="center">
-  <img src="asset/images/image1.png" alt="SQL Agent Output" width="800" />
+  <img src="asset/images/image4.png" alt="SQL Agent Output" width="800" />
   <p><i>ตัวอย่างการทำงานของ SQL Agent - ถาม-ตอบกับฐานข้อมูล SQLite</i></p>
-</div>
-
-### 🔍 **Web Search Agent**
-```python
-# ค้นหาข่าวสารล่าสุด
-query = "ข่าวเทคโนโลยีล่าสุดวันนี้คืออะไร?"
-response = agent.invoke(query)
-# ผลลัพธ์: รายงานข่าวเทคโนโลยีล่าสุดจากแหล่งข้อมูลหลากหลาย
-```
-
-<div align="center">
-  <img src="asset/images/image2.png" alt="Web Search Agent Output" width="800" />
-  <p><i>ตัวอย่างการทำงานของ Web Search Agent - ค้นหาข้อมูลสดจากอินเทอร์เน็ต</i></p>
 </div>
 
 ### 🎨 **Creative Writing Agent**
@@ -154,7 +141,7 @@ result = creative_chain.invoke(idea)
 ```
 
 <div align="center">
-  <img src="asset/images/image3.png" alt="Creative Agent Output" width="800" />
+  <img src="asset/images/image1.png" alt="Creative Agent Output" width="800" />
   <p><i>ตัวอย่างการทำงานของ Creative Agent - สร้างเรื่องสั้นและแปลงเป็นกลอน</i></p>
 </div>
 
@@ -180,7 +167,7 @@ result = chain.invoke({"topic": topic})
 ```
 
 <div align="center">
-  <img src="asset/images/image5.png" alt="Basic LLM Output" width="800" />
+  <img src="asset/images/image2.png" alt="Basic LLM Output" width="800" />
   <p><i>ตัวอย่างการทำงานของ Basic LLM Pipeline - อธิบายหัวข้อให้เข้าใจง่าย</i></p>
 </div>
 
