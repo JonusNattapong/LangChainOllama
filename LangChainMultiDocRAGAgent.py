@@ -54,7 +54,7 @@ class MultiDocRAGAgent:
             logging.getLogger(__name__).exception("เกิดข้อผิดพลาดในการสร้าง vectorstore")
 
     def setup_qa_chain(self) -> None:
-        """ตั้งค่า QA chain สำหรับการถามตอบ"""
+        """ตั้งค่า QA chain สำหรับการถามตอบ (คืน source documents ด้วย)"""
         try:
             if not self.vectorstore:
                 return
@@ -67,7 +67,8 @@ class MultiDocRAGAgent:
                 llm=self.llm,
                 chain_type="stuff",
                 retriever=retriever,
-                chain_type_kwargs={"prompt": prompt}
+                chain_type_kwargs={"prompt": prompt},
+                return_source_documents=True
             )
         except Exception as e:
             import logging
@@ -75,22 +76,25 @@ class MultiDocRAGAgent:
             logging.getLogger(__name__).exception("เกิดข้อผิดพลาดในการตั้งค่า QA chain")
 
     def query(self, question: str) -> dict:
-        """ส่งคำถามไปยัง QA chain และส่งคืนคำตอบ"""
+        """ส่งคำถามไปยัง QA chain และส่งคืนคำตอบ พร้อมเนื้อหาต้นทาง (context)"""
         try:
             if not isinstance(question, str) or not question.strip():
-                return {"answer": "คำถามว่างหรือไม่ถูกต้อง", "sources": []}
+                return {"answer": "คำถามว่างหรือไม่ถูกต้อง", "sources": [], "contexts": []}
             if not self.qa_chain:
-                return {"answer": "ระบบยังไม่พร้อมใช้งาน", "sources": []}
-            result = self.qa_chain.invoke(question)
+                return {"answer": "ระบบยังไม่พร้อมใช้งาน", "sources": [], "contexts": []}
+            result = self.qa_chain({"query": question})
+            # ดึง context ต้นทาง (เนื้อหาที่ใช้ตอบ)
+            contexts = [doc.page_content for doc in result.get("source_documents", [])]
             return {
                 "answer": result.get("result", "ไม่พบคำตอบ"),
-                "sources": [doc.metadata.get("source", "ไม่ทราบแหล่งที่มา") for doc in result.get("source_documents", [])]
+                "sources": [doc.metadata.get("source", "ไม่ทราบแหล่งที่มา") for doc in result.get("source_documents", [])],
+                "contexts": contexts
             }
         except Exception as e:
             import logging
             logging.basicConfig(level=logging.INFO)
             logging.getLogger(__name__).exception("เกิดข้อผิดพลาดในการถาม MultiDoc QA")
-            return {"answer": f"เกิดข้อผิดพลาด: {e}", "sources": []}
+            return {"answer": f"เกิดข้อผิดพลาด: {e}", "sources": [], "contexts": []}
 
 if __name__ == "__main__":
     agent = MultiDocRAGAgent()

@@ -81,11 +81,10 @@ class PDFQAAgent:
 
 if __name__ == "__main__":
     agent = PDFQAAgent()
-    chunks = agent.load_pdf("example.pdf")
+    chunks = agent.load_pdf("2505.04588v1.pdf")
     if chunks:
         agent.create_vectorstore(chunks)
         agent.setup_qa_chain()
-        print(agent.query("AI คืออะไร?"))
+        print(agent.query("ZEROSEARCH คือ งานวิจัยเกี่ยวกับ อะไร? พออธิบายให้เข้าใจง่ายๆ ได้ไหม?"))
     else:
-        print("ไม่พบไฟล์ PDF หรือไม่สามารถโหลดได้")
         print("ไม่พบไฟล์ PDF หรือไม่สามารถโหลดได้")
