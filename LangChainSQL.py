@@ -8,32 +8,29 @@ import sqlite3
 import os
 
 def setup_database():
-    """ตั้งค่าฐานข้อมูลตัวอย่าง"""
-    conn = sqlite3.connect('example.db')
-    cursor = conn.cursor()
-    
-    # สร้างตาราง users
-    cursor.execute('''CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        age INTEGER NOT NULL,
-        email TEXT UNIQUE
-    )''')
-    
-    # ลบข้อมูลเดิมและรีเซ็ต id
-    cursor.execute("DELETE FROM users")
-    cursor.execute("DELETE FROM sqlite_sequence WHERE name='users'")
-    
-    # เพิ่มข้อมูลตัวอย่าง
-    sample_data = [
-        ('Alice', 30, 'alice@example.com'),
-        ('Bob', 25, 'bob@example.com'),
-        ('Charlie', 35, 'charlie@example.com')
-    ]
-    
-    cursor.executemany("INSERT INTO users (name, age, email) VALUES (?, ?, ?)", sample_data)
-    conn.commit()
-    conn.close()
+    try:
+        conn = sqlite3.connect('example.db')
+        cursor = conn.cursor()
+        cursor.execute('''CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            age INTEGER NOT NULL,
+            email TEXT UNIQUE
+        )''')
+        cursor.execute("DELETE FROM users")
+        cursor.execute("DELETE FROM sqlite_sequence WHERE name='users'")
+        sample_data = [
+            ('Alice', 30, 'alice@example.com'),
+            ('Bob', 25, 'bob@example.com'),
+            ('Charlie', 35, 'charlie@example.com')
+        ]
+        cursor.executemany("INSERT INTO users (name, age, email) VALUES (?, ?, ?)", sample_data)
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        import logging
+        logging.basicConfig(level=logging.INFO)
+        logging.getLogger(__name__).exception("เกิดข้อผิดพลาดในการตั้งค่าฐานข้อมูล")
 
 # 1. ตั้งค่าฐานข้อมูล
 setup_database()
@@ -57,12 +54,16 @@ agent_executor = create_sql_agent(
 )
 
 # 5. ฟังก์ชันสำหรับถามข้อมูล
-def query_database(question):
-    """ฟังก์ชันสำหรับถามข้อมูลจากฐานข้อมูล"""
+def query_database(question: str) -> str:
     try:
+        if not isinstance(question, str) or not question.strip():
+            return "คำถามว่างหรือไม่ถูกต้อง"
         response = agent_executor.invoke({"input": question})
         return response.get("output", "ไม่สามารถหาคำตอบได้")
     except Exception as e:
+        import logging
+        logging.basicConfig(level=logging.INFO)
+        logging.getLogger(__name__).exception("เกิดข้อผิดพลาดในการ query database")
         return f"เกิดข้อผิดพลาด: {e}"
 
 # 6. ตัวอย่างการใช้งาน
@@ -72,6 +73,11 @@ if __name__ == "__main__":
         "ใครอายุมากที่สุด?",
         "มีกี่คนที่อายุมากกว่า 30 ปี?"
     ]
+    for i, question in enumerate(questions, 1):
+        print(f"\n=== คำถามที่ {i}: {question} ===")
+        answer = query_database(question)
+        print(f"คำตอบ: {answer}")
+        print(f"คำตอบ: {answer}")
     
     for i, question in enumerate(questions, 1):
         print(f"\n=== คำถามที่ {i}: {question} ===")

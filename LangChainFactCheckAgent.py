@@ -13,7 +13,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class FactCheckAgent:
-    """คลาสสำหรับ Fact-checking Agent"""
+    """คลาสสำหรับ Fact-checking Agent (Product-ready)"""
     
     def __init__(self, main_model="llama3.2:3b", critic_model="llama3.2:3b"):
         self.main_model = main_model
@@ -23,16 +23,16 @@ class FactCheckAgent:
         self.setup_agents()
     
     def create_search_tool(self):
-        """สร้าง search tool พร้อม fallback"""
+        """สร้าง search tool พร้อม fallback และ robust error handling"""
         def search_with_fallback(query):
             try:
-                # ลอง API ก่อน
+                if not isinstance(query, str) or not query.strip():
+                    return "คำค้นหาว่างหรือไม่ถูกต้อง"
                 search_tool = DuckDuckGoSearchRun(backend="api")
                 return search_tool.run(query)
             except Exception as e:
                 logger.warning(f"API search ล้มเหลว: {e}, ลอง HTML backend")
                 try:
-                    # fallback ไป HTML
                     search_tool_html = DuckDuckGoSearchRun(backend="html")
                     return search_tool_html.run(query)
                 except Exception as e2:
@@ -94,9 +94,16 @@ class FactCheckAgent:
         except Exception as e:
             logger.error(f"เกิดข้อผิดพลาดในการตั้งค่า: {e}")
     
-    def fact_check(self, claim):
-        """ตรวจสอบความถูกต้องของข้ออ้าง"""
+    def fact_check(self, claim: str):
+        """ตรวจสอบความถูกต้องของข้ออ้าง (ตรวจสอบ input และ handle error)"""
         try:
+            if not isinstance(claim, str) or not claim.strip():
+                return {
+                    "claim": claim,
+                    "evidence": "ข้ออ้างว่างหรือไม่ถูกต้อง",
+                    "analysis": "ข้ออ้างว่างหรือไม่ถูกต้อง",
+                    "status": "ล้มเหลว"
+                }
             logger.info(f"เริ่มตรวจสอบข้ออ้าง: {claim}")
             
             # 1. ค้นหาข้อมูลสนับสนุน
@@ -118,7 +125,7 @@ class FactCheckAgent:
             }
             
         except Exception as e:
-            logger.error(f"เกิดข้อผิดพลาดในการตรวจสอบ: {e}")
+            logger.exception("เกิดข้อผิดพลาดในการตรวจสอบ")
             return {
                 "claim": claim,
                 "evidence": "ไม่สามารถค้นหาได้",

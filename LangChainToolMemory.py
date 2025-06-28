@@ -2,8 +2,7 @@ from langchain.agents import initialize_agent, Tool, AgentExecutor
 from langchain.memory import ConversationBufferMemory
 from langchain_ollama import OllamaLLM
 
-def get_exchange_rate(_):
-    """ฟังก์ชันจำลองการดูอัตราแลกเปลี่ยน"""
+def get_exchange_rate(_: str) -> str:
     return "อัตราแลกเปลี่ยนวันนี้คือ 36.50 บาท/ดอลลาร์"
 
 # สร้าง Tool เดียวที่จัดการได้หลายชื่อ
@@ -40,6 +39,7 @@ if __name__ == "__main__":
         # ทดสอบ Memory
         response2 = agent_executor.invoke("ขอบคุณสำหรับข้อมูล")
         print("ผลลัพธ์ที่ 2:", response2.get("output", response2))
-        
     except Exception as e:
-        print(f"เกิดข้อผิดพลาด: {e}")
+        import logging
+        logging.basicConfig(level=logging.INFO)
+        logging.getLogger(__name__).exception("เกิดข้อผิดพลาด")

@@ -5,14 +5,14 @@ from langchain_community.tools import DuckDuckGoSearchRun
 from langchain.agents import initialize_agent, Tool
 from langchain_ollama import OllamaLLM
 
-def search_with_final_answer(query):
-    """ฟังก์ชันค้นหาที่จัดรูปแบบผลลัพธ์เป็น Final Answer"""
+def search_with_final_answer(query: str) -> str:
     try:
+        if not isinstance(query, str) or not query.strip():
+            return "คำค้นหาว่างหรือไม่ถูกต้อง"
         search_tool = DuckDuckGoSearchRun(backend="api")
         result = search_tool.run(query)
         return f"Final Answer: {result}"
     except Exception as e:
-        # Fallback ไปใช้ backend="html" ถ้า api ไม่ได้
         try:
             search_tool_html = DuckDuckGoSearchRun(backend="html")
             result = search_tool_html.run(query)
@@ -47,4 +47,7 @@ if __name__ == "__main__":
         response = agent.invoke(query)
         print("ผลลัพธ์:", response.get("output", response))
     except Exception as e:
-        print(f"เกิดข้อผิดพลาด: {e}")
+        import logging
+        logging.basicConfig(level=logging.INFO)
+        logging.getLogger(__name__).exception("เกิดข้อผิดพลาด")
+        logging.getLogger(__name__).exception("เกิดข้อผิดพลาด")

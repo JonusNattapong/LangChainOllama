@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class CreativeAgent:
-    """คลาสสำหรับ Creative Writing Agent"""
+    """คลาสสำหรับ Creative Writing Agent (Product-ready)"""
     
     def __init__(self, model_name="llama3.2:3b"):
         self.model_name = model_name
@@ -22,7 +22,7 @@ class CreativeAgent:
         self.setup_chains()
     
     def setup_chains(self):
-        """ตั้งค่า chains สำหรับการสร้างสรรค์"""
+        """ตั้งค่า chains สำหรับการสร้างสรรค์ (พร้อม error handling)"""
         try:
             # Prompt สำหรับแต่งเรื่องสั้น
             story_prompt = PromptTemplate(
@@ -61,96 +61,128 @@ class CreativeAgent:
             # สร้าง chains
             self.story_chain = LLMChain(llm=self.llm, prompt=story_prompt, verbose=True)
             self.style_chain = LLMChain(llm=self.llm, prompt=style_prompt, verbose=True)
-            
-            # สร้าง sequential chain
             self.creative_chain = SimpleSequentialChain(
                 chains=[self.story_chain, self.style_chain],
                 verbose=True
             )
             
             logger.info("ตั้งค่า Creative Chains สำเร็จ")
-            
         except Exception as e:
-            logger.error(f"เกิดข้อผิดพลาดในการตั้งค่า: {e}")
-    
+            logger.exception("เกิดข้อผิดพลาดในการตั้งค่า Creative Chains")
+
     def create_story_only(self, idea):
-        """สร้างเฉพาะเรื่องสั้น"""
         try:
+            if not isinstance(idea, str) or not idea.strip():
+                return "ไอเดียว่างหรือไม่ถูกต้อง"
             result = self.story_chain.invoke({"idea": idea})
             return result.get("text", result)
         except Exception as e:
-            logger.error(f"เกิดข้อผิดพลาดในการสร้างเรื่อง: {e}")
+            logger.exception("เกิดข้อผิดพลาดในการสร้างเรื่อง")
             return f"ไม่สามารถสร้างเรื่องได้: {e}"
-    
+
     def create_poem_from_story(self, story):
-        """แปลงเรื่องเป็นกลอน"""
         try:
+            if not isinstance(story, str) or not story.strip():
+                return "เรื่องว่างหรือไม่ถูกต้อง"
             result = self.style_chain.invoke({"story": story})
             return result.get("text", result)
         except Exception as e:
-            logger.error(f"เกิดข้อผิดพลาดในการแปลงเป็นกลอน: {e}")
+            logger.exception("เกิดข้อผิดพลาดในการแปลงเป็นกลอน")
             return f"ไม่สามารถแปลงเป็นกลอนได้: {e}"
-    
+
     def create_full_work(self, idea):
-        """สร้างผลงานครบชุด (เรื่อง + กลอน)"""
         try:
+            if not isinstance(idea, str) or not idea.strip():
+                return "ไอเดียว่างหรือไม่ถูกต้อง"
             result = self.creative_chain.invoke(idea)
             return result
         except Exception as e:
-            logger.error(f"เกิดข้อผิดพลาดในการสร้างผลงาน: {e}")
+            logger.exception("เกิดข้อผิดพลาดในการสร้างผลงาน")
             return f"ไม่สามารถสร้างผลงานได้: {e}"
-    
+
     def create_custom_content(self, idea, content_type="story"):
-        """สร้างเนื้อหาตามประเภทที่กำหนด"""
         custom_prompts = {
             "story": "แต่งเรื่องสั้นแฟนตาซี",
             "poem": "แต่งกลอนสุภาพ",
             "dialog": "เขียนบทสนทนาที่น่าสนใจ",
             "description": "เขียนบรรยายฉากที่สวยงาม"
         }
-        
         prompt_text = custom_prompts.get(content_type, "สร้างเนื้อหาสร้างสรรค์")
-        
         custom_prompt = PromptTemplate(
             input_variables=["idea"],
             template=f"{prompt_text} จากไอเดีย: {{idea}}"
         )
-        
         try:
+            if not isinstance(idea, str) or not idea.strip():
+                return "ไอเดียว่างหรือไม่ถูกต้อง"
             custom_chain = LLMChain(llm=self.llm, prompt=custom_prompt)
             result = custom_chain.invoke({"idea": idea})
             return result.get("text", result)
         except Exception as e:
-            logger.error(f"เกิดข้อผิดพลาดในการสร้างเนื้อหา: {e}")
+            logger.exception("เกิดข้อผิดพลาดในการสร้างเนื้อหา")
             return f"ไม่สามารถสร้างเนื้อหาได้: {e}"
 
 # ฟังก์ชันสำหรับใช้งาน
+import argparse
+
 def main():
-    """ฟังก์ชันหลักสำหรับทดสอบ"""
-    # สร้าง creative agent
+    """
+    ฟังก์ชันหลักสำหรับทดสอบ CreativeAgent
+    สามารถรับไอเดียและ content_type จาก command line ได้
+    """
+    parser = argparse.ArgumentParser(description="CreativeAgent CLI")
+    parser.add_argument("--idea", type=str, help="ไอเดียสำหรับสร้างสรรค์")
+    parser.add_argument("--content_type", type=str, default="story", choices=["story", "poem", "dialog", "description"], help="ประเภทเนื้อหาที่ต้องการสร้าง")
+    parser.add_argument("--batch", nargs="+", help="ไอเดียหลายรายการ (batch)")
+    args = parser.parse_args()
+
     creative_agent = CreativeAgent()
-    
-    # ตัวอย่างไอเดีย
-    ideas = [
-        "เด็กชายคนหนึ่งพบไข่มังกรในป่าและต้องปกป้องมันจากผู้ล่า",
-        "นักผจญภัยสาวที่ค้นพบเมืองใต้น้ำที่สูญหายไปนานหลายศตวรรษ",
-        "เด็กหญิงที่มีพลังสื่อสารกับต้นไม้และต้องช่วยป่าจากการทำลาย"
-    ]
-    
-    for i, idea in enumerate(ideas, 1):
+
+    if args.idea:
         print(f"\n{'='*60}")
-        print(f"ผลงานสร้างสรรค์ที่ {i}")
-        print(f"{'='*60}")
-        print(f"ไอเดีย: {idea}")
-        print("\n" + "="*60)
-        
-        # สร้างผลงานครบชุด
-        result = creative_agent.create_full_work(idea)
+        print(f"ไอเดีย: {args.idea}")
+        print(f"ประเภทเนื้อหา: {args.content_type}")
+        if args.content_type == "story":
+            result = creative_agent.create_story_only(args.idea)
+        elif args.content_type == "poem":
+            story = creative_agent.create_story_only(args.idea)
+            result = creative_agent.create_poem_from_story(story)
+        elif args.content_type == "dialog" or args.content_type == "description":
+            result = creative_agent.create_custom_content(args.idea, content_type=args.content_type)
+        else:
+            result = creative_agent.create_full_work(args.idea)
         print("ผลงานสร้างสรรค์:")
         print(result)
-        
-        if i < len(ideas):  # ไม่แสดงสำหรับรายการสุดท้าย
-            input("\nกด Enter เพื่อดูผลงานถัดไป...")
+    elif args.batch:
+        for i, idea in enumerate(args.batch, 1):
+            print(f"\n{'='*60}")
+            print(f"ผลงานสร้างสรรค์ที่ {i}")
+            print(f"{'='*60}")
+            print(f"ไอเดีย: {idea}")
+            print("\n" + "="*60)
+            result = creative_agent.create_full_work(idea)
+            print("ผลงานสร้างสรรค์:")
+            print(result)
+            if i < len(args.batch):
+                input("\nกด Enter เพื่อดูผลงานถัดไป...")
+    else:
+        # Default demo
+        ideas = [
+            "เด็กชายคนหนึ่งพบไข่มังกรในป่าและต้องปกป้องมันจากผู้ล่า",
+            "นักผจญภัยสาวที่ค้นพบเมืองใต้น้ำที่สูญหายไปนานหลายศตวรรษ",
+            "เด็กหญิงที่มีพลังสื่อสารกับต้นไม้และต้องช่วยป่าจากการทำลาย"
+        ]
+        for i, idea in enumerate(ideas, 1):
+            print(f"\n{'='*60}")
+            print(f"ผลงานสร้างสรรค์ที่ {i}")
+            print(f"{'='*60}")
+            print(f"ไอเดีย: {idea}")
+            print("\n" + "="*60)
+            result = creative_agent.create_full_work(idea)
+            print("ผลงานสร้างสรรค์:")
+            print(result)
+            if i < len(ideas):
+                input("\nกด Enter เพื่อดูผลงานถัดไป...")
 
 if __name__ == "__main__":
     main()
