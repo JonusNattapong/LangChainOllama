@@ -16,6 +16,7 @@
 - [ภาพรวมของระบบ](#ภาพรวมของระบบ)
 - [Workflow ใหม่](#workflow-ใหม่)
 - [Best Practices](#best-practices)
+- [คำถามที่พบบ่อย (FAQ)](#คำถามที่พบบ่อย-faq)
 
 ## Features
 - รองรับ LLM จาก Ollama (เช่น llama3.2:3b, qwen3:1.7b)
@@ -645,7 +646,36 @@ graph TD
 - ใช้ .env สำหรับ key/token ทุกชนิด
 - **ขยายไอเดียใหม่**: เพิ่ม agent สำหรับค้นหาไอเดีย, สร้างเนื้อหาใหม่, หรือวิเคราะห์แนวโน้มเทคโนโลยีได้ง่ายด้วยการเพิ่มไฟล์ agent ใหม่และเชื่อมต่อกับ LLM
 
-## อัปเดตล่าสุด
-- ปรับปรุง error handling, logging, input validation
-- เพิ่มตัวอย่าง workflow สำหรับ Production-ready
-- ลบรายการซ้ำและจัดระเบียบเนื้อหา
+## คำถามที่พบบ่อย (FAQ)
+
+### Q: ต้องใช้ Python เวอร์ชันไหน?
+A: แนะนำ Python 3.10 ขึ้นไป (รองรับ 3.11, 3.12)
+
+### Q: ต้องใช้ GPU หรือไม่?
+A: ไม่จำเป็นต้องมี GPU แต่ถ้ามีจะช่วยให้ LLM ทำงานเร็วขึ้น (Ollama รองรับ CPU และ GPU)
+
+### Q: Ollama คืออะไร?
+A: Ollama เป็นระบบรัน LLM (Local Language Model) บนเครื่องของคุณเอง รองรับโมเดลหลากหลาย เช่น llama3, qwen3, phi3 ฯลฯ
+
+### Q: จะเพิ่ม Agent ใหม่เองได้อย่างไร?
+A: สามารถสร้างไฟล์ Python ใหม่ตามตัวอย่าง agent เดิม แล้วเชื่อมต่อกับ LLM หรือเวกเตอร์สโตร์ได้ทันที (ดูตัวอย่างใน README)
+
+### Q: ใช้ Embedding/Vector DB อะไร?
+A: ใช้ FAISS + HuggingFace Embeddings (รองรับ multilingual)
+
+### Q: ถ้า DuckDuckGo Search ใช้ไม่ได้ต้องทำอย่างไร?
+A: ระบบมี fallback หลายกลยุทธ์ เช่น Bing API, HTML scraping, simplified query
+
+### Q: รองรับภาษาอะไรบ้าง?
+A: ไทย อังกฤษ จีน ญี่ปุ่น และภาษาอื่น ๆ ที่โมเดลรองรับ
+
+### Q: จะ deploy เป็น production ได้ไหม?
+A: ได้ แนะนำให้ใช้ reverse proxy, จำกัด access, และตรวจสอบ resource consumption
+
+### Q: มี license อะไร?
+A: โค้ดนี้ใช้ MIT License (ฟรีสำหรับใช้งานและดัดแปลง)
+
+### Q: ถ้าเจอปัญหา/bug ต้องทำอย่างไร?
+A: สามารถเปิด issue ใน GitHub หรือดู CONTRIBUTING.md เพื่อแนวทางการรายงานปัญหา
+
+---
