@@ -19,7 +19,7 @@
 - [คำถามที่พบบ่อย (FAQ)](#คำถามที่พบบ่อย-faq)
 
 ## Features
-- รองรับ LLM จาก Ollama (เช่น llama3.2:3b, qwen3:1.7b)
+- รองรับ LLM จาก Ollama (เช่น llama3.2:3b, qwen3:1.7b และอื่นๆ)
 - ตัวอย่าง Agent หลากหลายรูปแบบ (Basic, RAG, SQL, Tool+Memory, Web, Fact-check, Creative, Summarization, PDF Q&A, Multi-Document RAG, **Translation, Web Search**, **Knowledge Graph**, **Sentiment Analysis**, **Text Classification**, **Data Extraction**, **Code Generation**)
 - ใช้ FAISS + HuggingFace Embeddings สำหรับ RAG
 - Agent พร้อม memory, error handling, logging และ input validation
