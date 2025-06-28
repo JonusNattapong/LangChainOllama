@@ -565,6 +565,77 @@ graph TD
 
 ---
 
+## ตัวอย่างการใช้งาน CLI ของแต่ละสคริปต์
+
+> หมายเหตุ: ตัวอย่างนี้สำหรับรันบน Windows (cmd) หรือ Linux/Mac (bash) ได้เหมือนกัน
+
+- **Basic Agent**
+  ```sh
+  python LangChainBasic.py --input "หัวข้อหรือข้อความที่ต้องการถาม"
+  ```
+- **RAG Agent**
+  ```sh
+  python LangChainRAG.py --file "path/to/document.txt" --query "คำถามของคุณ"
+  ```
+- **Multi-Document RAG Agent**
+  ```sh
+  python LangChainMultiDocRAGAgent.py --files "doc1.txt,doc2.pdf" --query "คำถามของคุณ"
+  ```
+- **SQL Agent**
+  ```sh
+  python LangChainSQL.py --db "example.db" --query "SELECT * FROM table_name;"
+  ```
+- **Web Tool Agent**
+  ```sh
+  python LangChainWebTool.py --query "ข่าวเทคโนโลยี AI ล่าสุดวันนี้"
+  ```
+- **Translation Agent**
+  ```sh
+  python LangChainTranslationAgent.py --text "สวัสดีครับ" --target_lang "en"
+  ```
+- **PDF Q&A Agent**
+  ```sh
+  python LangChainPDFQAAgent.py --file "example.pdf" --query "เนื้อหาเกี่ยวกับอะไร?"
+  ```
+- **Knowledge Graph Agent**
+  ```sh
+  python LangChainKnowledgeGraphAgent.py --text "บริษัท A ซื้อบริษัท B"
+  ```
+- **Sentiment Analysis Agent**
+  ```sh
+  python LangChainSentimentAgent.py --text "วันนี้รู้สึกดีมาก"
+  ```
+- **Text Classification Agent**
+  ```sh
+  python LangChainTextClassificationAgent.py --text "ข่าวเศรษฐกิจวันนี้"
+  ```
+- **Data Extraction Agent**
+  ```sh
+  python LangChainDataExtractionAgent.py --text "บริษัท ABC จำกัด ก่อตั้งปี 2020"
+  ```
+- **Code Generation Agent**
+  ```sh
+  python LangChainCodeGenAgent.py --task "เขียนฟังก์ชันหาค่าเฉลี่ยของตัวเลขใน list"
+  ```
+- **Creative Agent**
+  ```sh
+  python LangChainCreativeAgent.py --idea "เด็กชายคนหนึ่งพบไข่มังกรในป่า"
+  ```
+- **Summarization Agent**
+  ```sh
+  python LangChainSummarizationAgent.py --text "เนื้อหายาว ๆ ..."
+  ```
+- **Tool+Memory Agent**
+  ```sh
+  python LangChainToolMemory.py --input "อัตราแลกเปลี่ยนวันนี้เท่าไร"
+  ```
+- **Fact-Check Agent**
+  ```sh
+  python LangChainFactCheckAgent.py --claim "AI จะมาแทนที่มนุษย์ทุกอาชีพ"
+  ```
+
+> สามารถดู options เพิ่มเติมได้โดยรัน `python <script>.py --help` (ถ้าสคริปต์รองรับ)
+
 ## Best Practices
 
 - ตรวจสอบ resource consumption ของ LLM/embedding
