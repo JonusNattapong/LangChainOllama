@@ -289,6 +289,16 @@ graph TD
 
 ---
 
+> **NEW: รองรับ persistent vector DB (Pinecone, Weaviate), document loaders (PDF, web, etc.), API endpoint, authentication, caching, และ RAG evaluation metrics**
+> - สามารถสลับใช้ FAISS (local), Pinecone, หรือ Weaviate ได้ใน config
+> - เพิ่ม document loader สำหรับ PDF, เว็บไซต์, TXT, Markdown ฯลฯ
+> - มี FastAPI endpoint พร้อม JWT/API key authentication
+> - รองรับ caching (in-memory/Redis) สำหรับ performance
+> - มีฟังก์ชันวัดคุณภาพ RAG (precision, recall, answer quality)
+> - ตัวอย่าง MCP integration (client/monitoring) พร้อมใช้งาน
+
+---
+
 ### 2. RAG Agent (`LangChainRAG.py`)
 
 ```mermaid
